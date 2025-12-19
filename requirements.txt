@@ -4,3 +4,5 @@ cloudpickle==3.0.0
 pandas 
 python-dotenv 
 dagshub
+dvc
+dvc-s3
