@@ -1,7 +1,6 @@
 [core]
     remote = origin
 ['remote "origin"']
-    url = https://dagshub.com/rahmmaakhlefa/tunsent-mlops.git
-    auth = basic
-    user = rahmmaakhlefa
-    password = Rahma*14611760
+    url =  s3://dvc
+    endpointurl = https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa
+   
