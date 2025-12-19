@@ -34,8 +34,9 @@ logs.txt
 
 # Data & Models (if tracked by DVC, ignore usually managed by DVC or explicit ignore here if local only)
 # data/ is likely tracked by DVC or should be ignored if large
-data/
+data/**
 !data/*.dvc
+!data/.gitignore
 model_registry/
 tunbert_finetuned/
 
