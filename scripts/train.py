@@ -271,8 +271,8 @@ def save_results_summary(results):
     
     print(df_results.to_string(index=False))
     
-    # Sauvegarder CSV dans model registry
-    results_path = MODEL_REGISTRY_DIR / 'ml_models_results.csv'
+    # Sauvegarder CSV à la racine (pour éviter overlap DVC avec le dossier output)
+    results_path = BASE_DIR / 'metrics.csv'
     df_results.to_csv(results_path, index=False)
     print(f"\n✅ Résultats sauvegardés: {results_path}")
     
