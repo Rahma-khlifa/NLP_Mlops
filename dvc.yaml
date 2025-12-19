@@ -1,0 +1,27 @@
+# Pipeline DVC - MLOps Election
+# Automatise le preprocessing et l'entraînement des modèles
+
+stages:
+  preprocess:
+    cmd: python scripts/preprocess.py
+    deps:
+      - scripts/preprocess.py
+      - data/version1.xlsx
+    outs:
+      - processors/preprocessed_data.pkl
+      - processors/tfidf_vectorizer.pkl
+      - processors/cleaned_texts.pkl
+    desc: "Prétraitement des données: nettoyage, vectorisation TF-IDF, split 70-15-15"
+
+  train:
+    cmd: python scripts/train.py
+    deps:
+      - scripts/train.py
+      - processors/preprocessed_data.pkl
+      - processors/tfidf_vectorizer.pkl
+    outs:
+      - models/
+    metrics:
+      - models/ml_models_results.csv:
+          cache: false
+    desc: "Entraînement des modèles ML avec MLflow tracking"

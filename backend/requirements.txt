@@ -1,0 +1,12 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart
+xgboost
+flask==2.3.3
+requests==2.31.0
+python-dotenv
+mlflow==2.12.1 
+scikit-learn==1.4.2 
+cloudpickle==3.0.0 
+pandas 
+dagshub

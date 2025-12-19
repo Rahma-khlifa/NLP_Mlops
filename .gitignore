@@ -1,0 +1,43 @@
+# Basics
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.DS_Store
+
+# Virtual Environments
+venv/
+env/
+mlops-env/
+venv_*/
+
+# Environment Variables
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+
+# Distribution / Checkpoints
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+logs/
+logs.txt
+
+# Data & Models (if tracked by DVC, ignore usually managed by DVC or explicit ignore here if local only)
+# data/ is likely tracked by DVC or should be ignored if large
+data/
+model_registry/
+tunbert_finetuned/
+
+# DVC
+.dvc/cache
+.dvc/tmp

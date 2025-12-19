@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  PYTHONUNBUFFERED: 1
+  MLFLOW_EXPERIMENT: tunsentt
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install training requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure DVC remote
+        run: |
+          dvc remote modify origin endpointurl https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa
+          dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Pull data from DVC
+        run: dvc pull -v
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Check data presence
+        run: ls -R data/
+
+      - name: Install backend requirements
+        run: pip install -r backend/requirements.txt
+
+      - name: Install frontend requirements
+        run: pip install -r frontend/requirements.txt
+
+      - name: Run training
+        run: python scripts/train.py
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
+
+      - name: Register best model
+        run: python scripts/register_best_model.py
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
+
+      - name: Build & run Docker Compose
+        run: |
+          docker-compose down || true
+          docker-compose up -d --build
