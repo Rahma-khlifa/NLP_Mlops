@@ -35,9 +35,10 @@ logs.txt
 # Data & Models (if tracked by DVC, ignore usually managed by DVC or explicit ignore here if local only)
 # data/ is likely tracked by DVC or should be ignored if large
 data/
+!data/*.dvc
 model_registry/
 tunbert_finetuned/
 
 # DVC
-.dvc/cache
 .dvc/tmp
+.dvc/cache
