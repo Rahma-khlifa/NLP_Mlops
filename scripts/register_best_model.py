@@ -17,7 +17,7 @@ load_dotenv(BASE_DIR / '.env')
         
 # Config
 DAGSHUB_USERNAME = os.getenv('DAGSHUB_USERNAME', '')
-DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'mlops_election')
+DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'NLP_Mlops')
 MLFLOW_TRACKING_URI = os.getenv('MLFLOW_TRACKING_URI', f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow")
 EXPERIMENT_NAME = os.getenv('MLFLOW_EXPERIMENT', 'tunsentt')
 

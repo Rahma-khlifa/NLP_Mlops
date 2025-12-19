@@ -59,36 +59,31 @@ print()
 # ... (Les fonctions setup_mlflow, load_preprocessed_data, load_vectorizer, get_ml_models, calculate_metrics restent identiques) ...
 def setup_mlflow():
     """Configure MLflow tracking avec DagsHub"""
-    DAGSHUB_USERNAME = os.getenv('DAGSHUB_USERNAME', 'rahmmaakhlefa')
-    DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'NLP_Mlops')
-    DAGSHUB_TOKEN = os.getenv('DAGSHUB_TOKEN', '')
-    
-    MLFLOW_TRACKING_URI = os.getenv(
-        'MLFLOW_TRACKING_URI',
-        f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow"
-    )
-    # Allow overriding the experiment name from environment (useful if experiment was deleted)
+    DAGSHUB_USERNAME = os.getenv('DAGSHUB_USERNAME', 'rahmmaakhlefa').strip()
+    DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'NLP_Mlops').strip()
+    DAGSHUB_TOKEN = os.getenv('DAGSHUB_TOKEN', '').strip()
     
     print("\n🔧 Configuration MLflow & DagsHub")
     print("-" * 80)
     
-    # Configure DagsHub authentication if token is available
-    if DAGSHUB_TOKEN:
-        os.environ['MLFLOW_TRACKING_USERNAME'] = DAGSHUB_USERNAME
-        os.environ['MLFLOW_TRACKING_PASSWORD'] = DAGSHUB_TOKEN
-        print(f"✅ DagsHub authentication configured with token")
-    else:
-        # Only try dagshub.init() if no token (local development)
-        try:
-            dagshub.init(repo_owner=DAGSHUB_USERNAME, repo_name=DAGSHUB_REPO, mlflow=True)
-            print(f"✅ DagsHub initialisé: {DAGSHUB_USERNAME}/{DAGSHUB_REPO}")
-        except Exception as e:
-            print(f"⚠️  DagsHub warning: {e}")
+    # Use dagshub.init to handle URI and auth automatically
+    try:
+        if DAGSHUB_TOKEN:
+            os.environ['MLFLOW_TRACKING_USERNAME'] = DAGSHUB_USERNAME
+            os.environ['MLFLOW_TRACKING_PASSWORD'] = DAGSHUB_TOKEN
+            
+        dagshub.init(repo_owner=DAGSHUB_USERNAME, repo_name=DAGSHUB_REPO, mlflow=True)
+        print(f"✅ DagsHub initialisé: {DAGSHUB_USERNAME}/{DAGSHUB_REPO}")
+        print(f"✅ MLflow Tracking URI: {mlflow.get_tracking_uri()}")
+    except Exception as e:
+        print(f"⚠️  DagsHub initialization warning: {e}")
+        # Fallback to manual URI if init fails
+        URI = f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow"
+        mlflow.set_tracking_uri(URI)
+        print(f"⚠️  Fallback Tracking URI: {URI}")
     
-    # Configurer MLflow
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment("tunsentt")
-    print(f"✅ MLflow Tracking URI: {MLFLOW_TRACKING_URI}")
+    print(f"✅ MLflow Experiment: tunsentt")
     print()
 
 
