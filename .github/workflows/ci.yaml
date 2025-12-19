@@ -34,7 +34,7 @@ jobs:
 
       - name: Configure DVC remote
         run: |
-          dvc remote modify origin endpointurl https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa/tunsent-mlops
+          dvc remote modify origin endpointurl https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa/NLP_Mlops
           dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
