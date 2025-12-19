@@ -1,5 +1,4 @@
 [core]
     remote = origin
 [remote "origin"]
-    url = s3://dvc
-    endpointurl = https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa/tunsent-mlops
+    url = https://dagshub.com/rahmmaakhlefa/tunsent-mlops.dvc
