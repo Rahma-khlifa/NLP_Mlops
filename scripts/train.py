@@ -60,7 +60,7 @@ print()
 def setup_mlflow():
     """Configure MLflow tracking avec DagsHub"""
     DAGSHUB_USERNAME = os.getenv('DAGSHUB_USERNAME', 'rahmmaakhlefa')
-    DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'tunsent-mlops')
+    DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'NLP_Mlops')
     DAGSHUB_TOKEN = os.getenv('DAGSHUB_TOKEN', '')
     
     MLFLOW_TRACKING_URI = os.getenv(
