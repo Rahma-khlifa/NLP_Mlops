@@ -38,15 +38,17 @@ jobs:
 
       - name: Configure DVC remote
         run: |
-          dvc remote modify origin user ${{ secrets.DAGSHUB_USERNAME }}
-          dvc remote modify origin password ${{ secrets.DAGSHUB_TOKEN }}
+          dvc remote add --local dagshub-ci https://dagshub.com/rahmmaakhlefa/NLP_Mlops.dvc || true
+          dvc remote modify dagshub-ci auth basic
+          dvc remote modify dagshub-ci user ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify dagshub-ci password ${{ secrets.DAGSHUB_TOKEN }}
           dvc remote list
           dvc doctor
 
       - name: Pull data from DVC
         run: |
           echo "Attempting DVC pull from origin..."
-          dvc pull -r origin -v || (echo "DVC pull from origin failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
+          dvc pull -r dagshub-ci -v || (echo "DVC pull from origin failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
           
       - name: Verify data presence
         run: |
