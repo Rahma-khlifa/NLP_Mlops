@@ -37,16 +37,20 @@ jobs:
         run: |
           dvc remote modify origin access_key_id ${{ secrets.DAGSHUB_USERNAME }}
           dvc remote modify origin secret_access_key ${{ secrets.DAGSHUB_TOKEN }}
+          dvc remote list
+          dvc doctor
 
       - name: Pull data from DVC
         run: |
-          dvc pull -v || (echo "DVC pull failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
+          echo "Attempting DVC pull from origin..."
+          dvc pull -r origin -v || (echo "DVC pull from origin failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
           
       - name: Verify data presence
         run: |
+          echo "Checking data directory content:"
+          ls -R data/
           if [ ! -f "data/version1.xlsx" ]; then
             echo "❌ ERROR: data/version1.xlsx not found after dvc pull!"
-            ls -R data/
             exit 1
           fi
           echo "✅ data/version1.xlsx is present"
