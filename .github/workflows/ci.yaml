@@ -38,8 +38,8 @@ jobs:
 
       - name: Configure DVC remote
         run: |
-          dvc remote modify origin access_key_id ${{ secrets.DAGSHUB_USERNAME }}
-          dvc remote modify origin secret_access_key ${{ secrets.DAGSHUB_TOKEN }}
+          dvc remote modify origin user ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify origin password ${{ secrets.DAGSHUB_TOKEN }}
           dvc remote list
           dvc doctor
 

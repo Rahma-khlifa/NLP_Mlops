@@ -1,0 +1,5 @@
+outs:
+- md5: 77e74c33da192a03d1cc278cd84d5876
+  size: 44
+  hash: md5
+  path: test_push.txt

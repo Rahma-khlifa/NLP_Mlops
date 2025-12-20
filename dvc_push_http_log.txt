@@ -1,0 +1,6 @@
+2025-12-20 01:28:00,010 DEBUG: v3.64.2 (pip), CPython 3.13.1 on Windows-11-10.0.26100-SP0
+2025-12-20 01:28:00,010 DEBUG: command: push -r dagshub_http -v
+Everything is up to date.
+2025-12-20 01:28:01,419 DEBUG: Analytics is enabled.
+2025-12-20 01:28:01,516 DEBUG: Trying to spawn ['daemon', 'analytics', 'C:\\Users\\user\\AppData\\Local\\Temp\\tmpsnv_f8d0', '-v']
+2025-12-20 01:28:01,532 DEBUG: Spawned ['daemon', 'analytics', 'C:\\Users\\user\\AppData\\Local\\Temp\\tmpsnv_f8d0', '-v'] with pid 3440

@@ -1,0 +1,6 @@
+2025-12-20 01:08:30,678 DEBUG: v3.64.2 (pip), CPython 3.13.1 on Windows-11-10.0.26100-SP0
+2025-12-20 01:08:30,678 DEBUG: command: push -r origin -v
+Everything is up to date.
+2025-12-20 01:08:33,229 DEBUG: Analytics is enabled.
+2025-12-20 01:08:33,281 DEBUG: Trying to spawn ['daemon', 'analytics', 'C:\\Users\\user\\AppData\\Local\\Temp\\tmpzego0np9', '-v']
+2025-12-20 01:08:33,286 DEBUG: Spawned ['daemon', 'analytics', 'C:\\Users\\user\\AppData\\Local\\Temp\\tmpzego0np9', '-v'] with pid 21656
