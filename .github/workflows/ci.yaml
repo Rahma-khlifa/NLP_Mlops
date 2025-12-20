@@ -82,5 +82,36 @@ jobs:
           GITHUB_ACTIONS: "true"
         run: python scripts/train.py
 
+      - name: Register best model
+        env:
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: python scripts/register_best_model.py
+
       - name: Check model output
-        run: ls -R models/ || echo "No models directory found"
+        run: |
+          echo "Checking model registry content:"
+          ls -R model_registry/ || echo "No model_registry directory found"
+
+      - name: Start services with Docker Compose
+        run: docker-compose up --build -d
+
+      - name: Wait for backend to be ready
+        run: |
+          echo "Waiting for backend to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health | grep -q '"status":"ok"'; then
+              echo "✅ Backend is UP and model is loaded"
+              exit 0
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          echo "❌ ERROR: Backend failed to start or load model within 60 seconds"
+          docker-compose logs backend
+          exit 1
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down
