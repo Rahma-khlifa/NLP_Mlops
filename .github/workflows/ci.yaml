@@ -38,7 +38,7 @@ jobs:
 
       - name: Configure DVC remote
         run: |
-          dvc remote add --local dagshub-ci https://dagshub.com/rahmmaakhlefa/NLP_Mlops.dvc || true
+          dvc remote add dagshub-ci https://dagshub.com/rahmmaakhlefa/NLP_Mlops.dvc || true
           dvc remote modify dagshub-ci auth basic
           dvc remote modify dagshub-ci user ${{ secrets.DAGSHUB_USERNAME }}
           dvc remote modify dagshub-ci password ${{ secrets.DAGSHUB_TOKEN }}
