@@ -95,7 +95,7 @@ jobs:
           ls -R model_registry/ || echo "No model_registry directory found"
 
       - name: Start services with Docker Compose
-        run: docker-compose up --build -d
+        run: docker compose up --build -d
 
       - name: Wait for backend to be ready
         run: |
@@ -109,9 +109,9 @@ jobs:
             sleep 2
           done
           echo "❌ ERROR: Backend failed to start or load model within 60 seconds"
-          docker-compose logs backend
+          docker compose logs backend
           exit 1
 
       - name: Stop services
         if: always()
-        run: docker-compose down
+        run: docker compose down
