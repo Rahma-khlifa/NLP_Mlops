@@ -45,10 +45,15 @@ jobs:
           dvc remote list
           dvc doctor
 
-      - name: Pull data from DVC
+      - name: Pull and Checkout Data
         run: |
-          echo "Attempting DVC pull from origin..."
-          dvc pull -r dagshub-ci -v || (echo "DVC pull from origin failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
+          echo "Attempting DVC pull from dagshub-ci..."
+          # 1. Pull: Télécharge les données dans le cache local du runner
+          dvc pull -r dagshub-ci -v
+          
+          # 2. Checkout: Matérialise les fichiers du cache vers le répertoire de travail
+          # C'est l'étape qui crée le fichier data/version1.xlsx à partir du cache
+          dvc checkout
           
       - name: Verify data presence
         run: |
