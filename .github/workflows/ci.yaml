@@ -34,7 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow
+          pip install dvc[s3] dagshub mlflow openpyxl
 
       - name: Configure DVC remote
         run: |
