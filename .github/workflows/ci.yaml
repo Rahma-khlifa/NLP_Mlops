@@ -34,14 +34,13 @@ jobs:
 
       - name: Configure DVC remote
         run: |
-          dvc remote modify origin access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          dvc remote modify origin secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          dvc remote modify origin access_key_id ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify origin secret_access_key ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Pull data from DVC
-        run: dvc pull -v
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          dvc pull -v
+          ls -R data/
 
       - name: Check data presence
         run: ls -R data/

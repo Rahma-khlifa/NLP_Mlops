@@ -1,5 +1,12 @@
 [core]
     remote = origin
+[cache]
+    type = copy
 [remote "origin"]
     url = s3://dvc
     endpointurl = https://dagshub.com/api/v1/repo-buckets/s3/rahmmaakhlefa/NLP_Mlops
+[remote "dagshub_http"]
+    url = https://dagshub.com/rahmmaakhlefa/NLP_Mlops.dvc
+    auth = basic
+    user = rahmmaakhlefa
+    password = be7aabfcb07be76a130331362aa414483ed805ce
