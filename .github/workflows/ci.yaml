@@ -39,11 +39,16 @@ jobs:
 
       - name: Pull data from DVC
         run: |
-          dvc pull -v
-          ls -R data/
-
-      - name: Check data presence
-        run: ls -R data/
+          dvc pull -v || (echo "DVC pull failed, trying HTTP remote..." && dvc pull -r dagshub_http -v)
+          
+      - name: Verify data presence
+        run: |
+          if [ ! -f "data/version1.xlsx" ]; then
+            echo "❌ ERROR: data/version1.xlsx not found after dvc pull!"
+            ls -R data/
+            exit 1
+          fi
+          echo "✅ data/version1.xlsx is present"
 
       - name: Install backend requirements
         run: pip install -r backend/requirements.txt

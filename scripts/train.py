@@ -59,29 +59,39 @@ print()
 # ... (Les fonctions setup_mlflow, load_preprocessed_data, load_vectorizer, get_ml_models, calculate_metrics restent identiques) ...
 def setup_mlflow():
     """Configure MLflow tracking avec DagsHub"""
+    # Use environment variables first
     DAGSHUB_USERNAME = os.getenv('DAGSHUB_USERNAME', 'rahmmaakhlefa').strip()
     DAGSHUB_REPO = os.getenv('DAGSHUB_REPO_NAME', 'NLP_Mlops').strip()
     DAGSHUB_TOKEN = os.getenv('DAGSHUB_TOKEN', '').strip()
     
+    # Check if we are in a CI environment (like GitHub Actions)
+    IS_CI = os.getenv('GITHUB_ACTIONS') == 'true'
+    
     print("\n🔧 Configuration MLflow & DagsHub")
     print("-" * 80)
     
-    # Use dagshub.init to handle URI and auth automatically
-    try:
-        if DAGSHUB_TOKEN:
-            os.environ['MLFLOW_TRACKING_USERNAME'] = DAGSHUB_USERNAME
-            os.environ['MLFLOW_TRACKING_PASSWORD'] = DAGSHUB_TOKEN
-            
-        dagshub.init(repo_owner=DAGSHUB_USERNAME, repo_name=DAGSHUB_REPO, mlflow=True)
-        print(f"✅ DagsHub initialisé: {DAGSHUB_USERNAME}/{DAGSHUB_REPO}")
-        print(f"✅ MLflow Tracking URI: {mlflow.get_tracking_uri()}")
-    except Exception as e:
-        print(f"⚠️  DagsHub initialization warning: {e}")
-        # Fallback to manual URI if init fails
-        URI = f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow"
-        mlflow.set_tracking_uri(URI)
-        print(f"⚠️  Fallback Tracking URI: {URI}")
+    # Configure authentication
+    if DAGSHUB_TOKEN:
+        os.environ['MLFLOW_TRACKING_USERNAME'] = DAGSHUB_USERNAME
+        os.environ['MLFLOW_TRACKING_PASSWORD'] = DAGSHUB_TOKEN
+        print(f"✅ Credentials configured (Token present)")
     
+    # Configure Tracking URI
+    TRACKING_URI = f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow"
+    mlflow.set_tracking_uri(TRACKING_URI)
+    print(f"✅ MLflow Tracking URI: {TRACKING_URI}")
+    
+    # Only call dagshub.init if NOT in CI to avoid interactive prompts
+    # If in CI, credentials are enough for MLflow to work via HTTPS
+    if not IS_CI:
+         try:
+            dagshub.init(repo_owner=DAGSHUB_USERNAME, repo_name=DAGSHUB_REPO, mlflow=True)
+            print(f"✅ DagsHub initialisé localement")
+         except Exception as e:
+            print(f"⚠️  DagsHub local init warning: {e}")
+    else:
+        print(f"🚀 CI detected: Skipping interactive dagshub.init")
+
     mlflow.set_experiment("tunsentt")
     print(f"✅ MLflow Experiment: tunsentt")
     print()
