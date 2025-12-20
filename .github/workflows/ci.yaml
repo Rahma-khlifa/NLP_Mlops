@@ -45,17 +45,21 @@ jobs:
           dvc remote list
           dvc doctor
 
-      - name: DVC Checkout (Matérialisation des liens )
+      - name: DVC Pull and Checkout Specific File
         run: |
-          echo "Executing DVC Checkout..."
-          # Cette commande crée les liens symboliques/fichiers légers
-          dvc checkout
-
-      - name: DVC Pull (Téléchargement des données réelles)
-        run: |
-          echo "Executing DVC Pull..."
-          # Cette commande télécharge le contenu réel si le cache est vide
-          dvc pull -r dagshub-ci -v
+          echo "Executing DVC Pull and Checkout for version1.xlsx..."
+          # Force le pull du fichier spécifique
+          dvc pull data/version1.xlsx.dvc -r dagshub-ci -v
+          
+          # Force le checkout du fichier spécifique
+          dvc checkout data/version1.xlsx.dvc
+          
+          # Vérification immédiate après le checkout
+          if [ ! -f "data/version1.xlsx" ]; then
+            echo "❌ ERROR: data/version1.xlsx not found after dvc checkout!"
+            exit 1
+          fi
+          echo "✅ data/version1.xlsx is present"
 
       - name: Verify data presence
         run: |
