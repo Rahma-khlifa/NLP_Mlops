@@ -16,7 +16,7 @@ OUTPUT_REPORT_PATH = 'evidently_reports/data_drift_report.html'
 # STATUS_FILE_PATH = 'data_drift_status.txt'
 
 # Colonne cible (label) - Assurez-vous que ce nom est correct
-TARGET_COLUMN = 'label' 
+TARGET_COLUMN = 'target' 
 
 # Seuil de colonnes en dérive (par exemple, si plus de 50% des colonnes sont en dérive, on considère qu'il y a un problème)
 MAX_DRIFTED_COLUMNS_SHARE = 0.5
