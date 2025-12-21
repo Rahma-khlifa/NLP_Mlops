@@ -30,11 +30,12 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install dependencies (including Evidently AI)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc[s3] dagshub mlflow openpyxl
+          # Ajout de evidently et pandas pour le monitoring de dérive
+          pip install dvc[s3] dagshub mlflow openpyxl evidently pandas
 
       - name: Configure DVC remote
         run: |
@@ -45,21 +46,26 @@ jobs:
           dvc remote list
           dvc doctor
 
-      - name: DVC Pull and Checkout Specific File
+      - name: DVC Pull and Checkout Specific Files (version1 and version2)
         run: |
-          echo "Executing DVC Pull and Checkout for version1.xlsx..."
-          # Force le pull du fichier spécifique
-          dvc pull data/version1.xlsx.dvc -r dagshub-ci -v
+          echo "Executing DVC Pull and Checkout for version1.xlsx and version2.xlsx..."
+          # Force le pull des fichiers spécifiques
+          dvc pull data/version1.xlsx.dvc data/version2.xlsx.dvc -r dagshub-ci -v
           
-          # Force le checkout du fichier spécifique
+          # Force le checkout des fichiers spécifiques
           dvc checkout data/version1.xlsx.dvc
+          dvc checkout data/version2.xlsx.dvc
           
           # Vérification immédiate après le checkout
           if [ ! -f "data/version1.xlsx" ]; then
             echo "❌ ERROR: data/version1.xlsx not found after dvc checkout!"
             exit 1
           fi
-          echo "✅ data/version1.xlsx is present"
+          if [ ! -f "data/version2.xlsx" ]; then
+            echo "❌ ERROR: data/version2.xlsx not found after dvc checkout!"
+            exit 1
+          fi
+          echo "✅ data/version1.xlsx and data/version2.xlsx are present"
 
       - name: Verify data presence
         run: |
@@ -69,12 +75,25 @@ jobs:
             echo "❌ ERROR: data/version1.xlsx not found after dvc pull!"
             exit 1
           fi
-          echo "✅ data/version1.xlsx is present"
+          if [ ! -f "data/version2.xlsx" ]; then
+            echo "❌ ERROR: data/version2.xlsx not found after dvc pull!"
+            exit 1
+          fi
+          echo "✅ data/version1.xlsx and data/version2.xlsx are present"
 
       - name: Install backend requirements
         run: pip install -r backend/requirements.txt || echo "No backend requirements found"
 
+      - name: Run Data Drift Check with Evidently AI
+        id: drift_check
+        run: |
+          # Créer le répertoire pour les rapports Evidently
+          mkdir -p evidently_reports
+          # Exécuter le script de détection de dérive et capturer la sortie
+          python scripts/evidently.py
+          
       - name: Run training
+        if: steps.drift_check.outputs.drift_status == 'DRIFT_DETECTED'
         env:
           DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
@@ -83,6 +102,7 @@ jobs:
         run: python scripts/train.py
 
       - name: Register best model
+        if: steps.drift_check.outputs.drift_status == 'DRIFT_DETECTED'
         env:
           DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
@@ -90,6 +110,7 @@ jobs:
         run: python scripts/register_best_model.py
 
       - name: Check model output
+        if: steps.drift_check.outputs.drift_status == 'DRIFT_DETECTED'
         run: |
           echo "Checking model registry content:"
           ls -R model_registry/ || echo "No model_registry directory found"
