@@ -46,7 +46,7 @@ jobs:
           dvc remote list
           dvc doctor
 
-            - name: DVC Pull and Checkout All Tracked Files
+      - name: DVC Pull and Checkout All Tracked Files
         run: |
           echo "Executing DVC Pull and Checkout for all tracked files..."
           
@@ -68,7 +68,6 @@ jobs:
             exit 1
           fi
           echo "✅ All required data files are present."
-
 
       - name: Verify data presence
         run: |
