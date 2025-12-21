@@ -105,7 +105,7 @@ jobs:
           # Créer le répertoire pour les rapports Evidently
           mkdir -p evidently_reports
           # Exécuter le script de détection de dérive et capturer la sortie
-          python scripts/evidently.py
+          python scripts/run_evidently.py
           
       - name: Run training
         if: steps.drift_check.outputs.drift_status == 'DRIFT_DETECTED'
