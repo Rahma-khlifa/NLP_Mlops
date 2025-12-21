@@ -3,7 +3,8 @@ import os
 import sys
 from evidently.test_suite import TestSuite
 from evidently.test_preset import DataDriftTestPreset
-from evidently.tests import TestShareOfDriftedColumns, TestColumnDrift, is_less_than
+from evidently.tests import TestShareOfDriftedColumns, TestColumnDrift
+from evidently.utils import is_less_than
 
 # --- Configuration ---
 # Chemins des fichiers de données
