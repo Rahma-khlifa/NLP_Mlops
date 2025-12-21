@@ -60,7 +60,7 @@ jobs:
           
           # 1. Pull tous les fichiers DVC suivis par le commit actuel
           # Le -f (force) est souvent nécessaire dans les environnements CI
-          dvc pull -r dagshub-ci -v --force-cloud
+          dvc pull -r dagshub-ci -v 
           
           # 2. Checkout pour restaurer les fichiers de données
           dvc checkout
