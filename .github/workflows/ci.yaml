@@ -94,24 +94,75 @@ jobs:
           echo "Checking model registry content:"
           ls -R model_registry/ || echo "No model_registry directory found"
 
-      - name: Start services with Docker Compose
-        run: docker compose up --build -d
+  deploy:
+    needs: ci
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Wait for backend to be ready
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install requirements for registration
         run: |
-          echo "Waiting for backend to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:8000/health | grep -q '"status":"ok"'; then
-              echo "✅ Backend is UP and model is loaded"
-              exit 0
-            fi
-            echo "Waiting... ($i/30)"
-            sleep 2
-          done
-          echo "❌ ERROR: Backend failed to start or load model within 60 seconds"
-          docker compose logs backend
-          exit 1
+          pip install -r requirements.txt
 
-      - name: Stop services
-        if: always()
-        run: docker compose down
+      - name: Download production artifacts (Model + Vectorizer)
+        run: |
+          python scripts/register_best_model.py
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          DAGSHUB_REPO_NAME: ${{ secrets.DAGSHUB_REPO_NAME }}
+
+      - name: Prepare VM directories
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ~/NLP_Mlops/model_registry
+            sudo chown -R ${{ secrets.VM_USER }}:${{ secrets.VM_USER }} ~/NLP_Mlops
+            sudo chmod -R 755 ~/NLP_Mlops
+
+      - name: Copy artifacts to Azure VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "model_registry/"
+          target: "~/NLP_Mlops/"
+          rm: false
+
+      - name: Deploy to Azure VM via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/NLP_Mlops
+            
+            # Ensure we are in a valid git repo (Fix for broken VM state)
+            if [ ! -d ".git" ]; then
+              echo "⚠️ .git not found. Initializing..."
+              git init
+              git remote add origin https://github.com/Rahma-khlifa/NLP_Mlops.git
+            fi
+
+            # Force sync with 'master'
+            git fetch origin master
+            git reset --hard origin/master
+            
+            # Restart with docker-compose
+            docker-compose down || true
+            docker-compose up -d --build
+            
+            # Clean up
+            docker image prune -f
