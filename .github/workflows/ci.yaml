@@ -50,23 +50,28 @@ jobs:
         run: |
           echo "Executing DVC Pull and Checkout for all tracked files..."
           
-          # Pull tous les fichiers DVC suivis par le commit actuel
-          # Cela inclura version1.xlsx et version2.xlsx
-          dvc pull -r dagshub-ci -v
+          # 1. Pull tous les fichiers DVC suivis par le commit actuel
+          # Le -f (force) est souvent nécessaire dans les environnements CI
+          dvc pull -r dagshub-ci -v -f
           
-          # Checkout pour restaurer les fichiers de données
+          # 2. Checkout pour restaurer les fichiers de données
           dvc checkout
           
-          # Vérification de la présence des fichiers (pour le débogage)
+          # 3. Afficher le contenu du répertoire de données pour le débogage
           echo "Contenu du répertoire data/ après checkout :"
           ls -l data/
           
-          # Vérification de la présence de version2.xlsx
+          # 4. Vérification de la présence des fichiers
+          if [ ! -f "data/version1.xlsx" ]; then
+            echo "❌ ERROR: data/version1.xlsx not found after dvc checkout!"
+            exit 1
+          fi
           if [ ! -f "data/version2.xlsx" ]; then
             echo "❌ ERROR: data/version2.xlsx not found after dvc checkout!"
             exit 1
           fi
           echo "✅ All required data files are present."
+
 
 
       - name: Verify data presence
