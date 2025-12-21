@@ -32,6 +32,8 @@ import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 from mlflow.exceptions import MlflowException
 import dagshub
+import logging
+logging.getLogger("mlflow").setLevel(logging.DEBUG)
 
 # Configuration
 BASE_DIR = Path(__file__).resolve().parent.parent
