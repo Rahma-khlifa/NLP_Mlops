@@ -43,7 +43,15 @@ jobs:
           dvc remote modify dagshub-ci auth basic
           dvc remote modify dagshub-ci user ${{ secrets.DAGSHUB_USERNAME }}
           dvc remote modify dagshub-ci password ${{ secrets.DAGSHUB_TOKEN }}
-          dvc remote list
+          # Ajout de commandes de débogage
+          echo "DVC Remote Configuration:"
+          dvc remote list -v
+          
+          echo "DVC Cache Status (should be empty in CI ):"
+          dvc cache dir
+          
+          echo "DVC Status (should show files to pull):"
+          dvc status
           dvc doctor
 
       - name: DVC Pull and Checkout All Tracked Files
@@ -52,7 +60,7 @@ jobs:
           
           # 1. Pull tous les fichiers DVC suivis par le commit actuel
           # Le -f (force) est souvent nécessaire dans les environnements CI
-          dvc pull -r dagshub-ci -v -f
+          dvc pull -r dagshub-ci -v --force-cloud
           
           # 2. Checkout pour restaurer les fichiers de données
           dvc checkout
