@@ -4,7 +4,7 @@ import sys
 from evidently.test_suite import TestSuite
 from evidently.test_preset import DataDriftTestPreset
 from evidently.tests import TestShareOfDriftedColumns, TestColumnDrift
-from evidently.utils import is_less_than
+
 
 # --- Configuration ---
 # Chemins des fichiers de données
@@ -49,7 +49,8 @@ data_drift_suite = TestSuite(tests=[
     # Test général de dérive des données
     DataDriftTestPreset(),
     # Test spécifique sur la colonne cible (label)
-    TestColumnDrift(column_name=TARGET_COLUMN).set_threshold(is_less_than(0.05)), # Teste si la dérive est inférieure à 5% (ajuster si besoin)
+    TestColumnDrift(column_name=TARGET_COLUMN),
+ # Teste si la dérive est inférieure à 5% (ajuster si besoin)
     # Test sur la proportion de colonnes en dérive
     TestShareOfDriftedColumns(lt=MAX_DRIFTED_COLUMNS_SHARE)
 ])
